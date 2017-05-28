@@ -10,7 +10,8 @@ $PROXY_DOMAIN = "github.com";
 $ROOT_CERT = __DIR__ . "/cacert.pem"; // Option - if you have these
 
 // !!!PLEASE!!! Create a OAuth applicaton in your Github settings, and put "Client Secret" at here.
-$PRIVATE_CLIENT_SECRET = 'a3a2d38d5f92559343845c6212fdd4a29d975d4c'; // Option - !MUST UPDATE!
+$PRIVATE_CLIENT_SECRET = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'; // Option - !MUST UPDATE!
+
 
 /*------------------------------------------------------------
 ** accept for frontend
