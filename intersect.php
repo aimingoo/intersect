@@ -2,7 +2,7 @@
 
 $ACCEPTED_METHODS = array('GET', 'POST', 'OPTIONS'); // GET, POST, PUT, DELETE, OPTIONS, PATCH
 $SIMPLE_DEFAULT_HOME = 'Api bridge by aimingoo.'; // Option
-$DOMAIN_ACCEPT = 'aimingoo.github.io';	// Option - Your Github pages site
+$DOMAIN_ACCEPT = 'aimingoo.github.io';    // Option - Your Github pages site
 $SOURCE_ACCEPT = $DOMAIN_ACCEPT;
 
 $PROXY_PROTOCOL = "https://";
@@ -18,69 +18,69 @@ $PRIVATE_CLIENT_SECRET = 'xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx'; // Option -
 **----------------------------------------------------------*/
 // CORS
 if (isset($_SERVER['HTTP_ORIGIN'])) {
-	header("Access-Control-Allow-Origin: {$_SERVER['HTTP_ORIGIN']}");
-	header('Access-Control-Allow-Credentials: true');
-	header("Access-Control-Allow-Methods: " . implode(', ', $ACCEPTED_METHODS));
-	// header('Access-Control-Max-Age: 86400');
+    header("Access-Control-Allow-Origin: {$_SERVER['HTTP_ORIGIN']}");
+    header('Access-Control-Allow-Credentials: true');
+    header("Access-Control-Allow-Methods: " . implode(', ', $ACCEPTED_METHODS));
+    // header('Access-Control-Max-Age: 86400');
 }
 
 // Simple home notice
 $REQUEST_URI = $_SERVER['REQUEST_URI'];
 if (empty($REQUEST_URI) || $REQUEST_URI === '/') {
-	die($SIMPLE_DEFAULT_HOME);
+    die($SIMPLE_DEFAULT_HOME);
 }
 
 // Simple method guard
 $method = strtoupper($_SERVER['REQUEST_METHOD']);
 if (array_search($method, $ACCEPTED_METHODS) === false) {
-	die('Error: Method no accept.');
+    die('Error: Method no accept.');
 }
 
 // Simple accept guard
 if (isset($_SERVER['HTTP_ORIGIN']) &&
-	!preg_match('{^https?://'.$SOURCE_ACCEPT.'}i', $_SERVER['HTTP_ORIGIN']))
+    !preg_match('{^https?://'.$SOURCE_ACCEPT.'}i', $_SERVER['HTTP_ORIGIN']))
 {
-	die('Error: Domain no accept.');
+    die('Error: Domain no accept.');
 }
 
 // simple accept guard
 if (isset($_SERVER['HTTP_REFERER']) &&
-	!preg_match('{^https?://'.$DOMAIN_ACCEPT.'}i', $_SERVER['HTTP_REFERER']))
+    !preg_match('{^https?://'.$DOMAIN_ACCEPT.'}i', $_SERVER['HTTP_REFERER']))
 {
-	die('Error: Source no accept.');
+    die('Error: Source no accept.');
 }
 
 // simple request guard
 if (!(
-	// preg_match('{^/login/oauth/authorize(\?|$)}', $REQUEST_URI) ||
-	preg_match('{^/login/oauth/access_token(\?|$)}', $REQUEST_URI)
+    // preg_match('{^/login/oauth/authorize(\?|$)}', $REQUEST_URI) ||
+    preg_match('{^/login/oauth/access_token(\?|$)}', $REQUEST_URI)
 )) {
-	die('Error: Api no accept.');
+    die('Error: Api no accept.');
 }
 
 // CORS's OPTIONS header checker
 if ($method == 'OPTIONS') {
-	// $_SERVER['HTTP_ORIGIN'] and $_SERVER['REQUEST_URI'] are checked, will
-	// skip Access-Control-Request-Method, Access-Control-Request-Headers ...
-	// and direct response.
-	if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS'])) {
-		header("Access-Control-Allow-Headers: " . $_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']);
-	}
+    // $_SERVER['HTTP_ORIGIN'] and $_SERVER['REQUEST_URI'] are checked, will
+    // skip Access-Control-Request-Method, Access-Control-Request-Headers ...
+    // and direct response.
+    if (isset($_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS'])) {
+        header("Access-Control-Allow-Headers: " . $_SERVER['HTTP_ACCESS_CONTROL_REQUEST_HEADERS']);
+    }
 
-	// header("Connection: Close");  // normal setting by gateway, 'Keep-Alive' etc.
-	header("Content-Length: 0");
-	die();
+    // header("Connection: Close");  // normal setting by gateway, 'Keep-Alive' etc.
+    header("Content-Length: 0");
+    die();
 }
 
 // for Github auth secret
-//	- get method, or post method with form-urlencoded
+//    - get method, or post method with form-urlencoded
 $CLIENT_SECRET = '';
 if (preg_match('{^/login/oauth/access_token(\?|$)}', $REQUEST_URI)) {
-	$CLIENT_SECRET = $PRIVATE_CLIENT_SECRET;
+    $CLIENT_SECRET = $PRIVATE_CLIENT_SECRET;
 }
 
 // URL of the target (this should be changed to be modular)
-//	- proxy to backend
+//    - proxy to backend
 $url = $PROXY_PROTOCOL.$PROXY_DOMAIN;
 $script_rel_path = preg_replace('/.*public_html/','', __FILE__); //not all servers have public_html
 $url_part = str_replace($script_rel_path, '', $_SERVER['REQUEST_URI']);
@@ -97,34 +97,34 @@ $append_request_length = 0;
  *  - http://blog.csdn.net/linvo/article/details/8816079
  */
 function curlPost($url, $timeout = 30, $CA = true){
-	$SSL = substr($url, 0, 8) == "https://" ? true : false;
+    $SSL = substr($url, 0, 8) == "https://" ? true : false;
 
-	// $ch = curl_init();
-	// curl_setopt($ch, CURLOPT_URL, $url);
-	global $curl, $ROOT_CERT;
-	$ch = $curl;
-	curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
-	curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout-2);
-	if ($SSL && $CA) {
-		curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $CA);
-		curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, $CA?2:1);
-		if ($CA) {
-			curl_setopt($ch, CURLOPT_CAINFO, $ROOT_CERT);
-		}
-	}
-	curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-	curl_setopt($ch, CURLOPT_HTTPHEADER, array('Expect:'));
-	curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
+    // $ch = curl_init();
+    // curl_setopt($ch, CURLOPT_URL, $url);
+    global $curl, $ROOT_CERT;
+    $ch = $curl;
+    curl_setopt($ch, CURLOPT_TIMEOUT, $timeout);
+    curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, $timeout-2);
+    if ($SSL && $CA) {
+        curl_setopt($ch, CURLOPT_SSL_VERIFYPEER, $CA);
+        curl_setopt($ch, CURLOPT_SSL_VERIFYHOST, $CA?2:1);
+        if ($CA) {
+            curl_setopt($ch, CURLOPT_CAINFO, $ROOT_CERT);
+        }
+    }
+    curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+    curl_setopt($ch, CURLOPT_HTTPHEADER, array('Expect:'));
+    curl_setopt($ch, CURLOPT_FOLLOWLOCATION, false);
 /* remove by aimingoo
-	curl_setopt($ch, CURLOPT_POST, true);
-	// curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
-	curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data)); //data with URLEncode
+    curl_setopt($ch, CURLOPT_POST, true);
+    // curl_setopt($ch, CURLOPT_POSTFIELDS, $data);
+    curl_setopt($ch, CURLOPT_POSTFIELDS, http_build_query($data)); //data with URLEncode
 
-	$ret = curl_exec($ch);
-	//var_dump(curl_error($ch));
+    $ret = curl_exec($ch);
+    //var_dump(curl_error($ch));
 
-	curl_close($ch);
-	return $ret;  
+    curl_close($ch);
+    return $ret;  
 */
 }
 
@@ -135,122 +135,122 @@ function curlPost($url, $timeout = 30, $CA = true){
  *  while passing a URL-encoded string will encode the data as application/x-www-form-urlencoded.
  */
 function mixopts($method) {
-	global $CLIENT_SECRET, $curl, $append_request_length;
+    global $CLIENT_SECRET, $curl, $append_request_length;
 
-	curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
-	if (empty($CLIENT_SECRET)) {
-		curl_setopt($curl, CURLOPT_POSTFIELDS, file_get_contents('php://input'));
-	}
-	else {
+    curl_setopt($curl, CURLOPT_CUSTOMREQUEST, $method);
+    if (empty($CLIENT_SECRET)) {
+        curl_setopt($curl, CURLOPT_POSTFIELDS, file_get_contents('php://input'));
+    }
+    else {
         $PARAM = '&client_secret=' . $CLIENT_SECRET;
-		curl_setopt($curl, CURLOPT_POSTFIELDS, file_get_contents('php://input') . $PARAM);
-		$append_request_length += strlen($PARAM);
-	}
+        curl_setopt($curl, CURLOPT_POSTFIELDS, file_get_contents('php://input') . $PARAM);
+        $append_request_length += strlen($PARAM);
+    }
 }
 
 
 function get() {
-	// curl default method
-	// 	- curl_setopt($curl, CURLOPT_HTTPGET, true);
-	global $CLIENT_SECRET, $url, $curl;
-	if (! empty($CLIENT_SECRET)) {  // !! rewrite
-		curl_setopt($curl, CURLOPT_URL, $url .
-			(empty($_SERVER['QUERY_STRING']) ? '?' : '&') . 'client_secret=' . $CLIENT_SECRET);
-	}
+    // curl default method
+    //     - curl_setopt($curl, CURLOPT_HTTPGET, true);
+    global $CLIENT_SECRET, $url, $curl;
+    if (! empty($CLIENT_SECRET)) {  // !! rewrite
+        curl_setopt($curl, CURLOPT_URL, $url .
+            (empty($_SERVER['QUERY_STRING']) ? '?' : '&') . 'client_secret=' . $CLIENT_SECRET);
+    }
 }
 
 function delete() {
-	curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "DELETE");
+    curl_setopt($curl, CURLOPT_CUSTOMREQUEST, "DELETE");
 }
 
 function post() {
-	global $url;
-	mixopts("POST");
-	curlPost($url);
+    global $url;
+    mixopts("POST");
+    curlPost($url);
 }
 
 function put() {
-	mixopts("PUT");
+    mixopts("PUT");
 }
 
 function patch() {
-	mixopts("PATCH");
+    mixopts("PATCH");
 }
 
 function applyRequestHeaders() {
-	global $append_request_length;
+    global $append_request_length;
 
-	$headers = array();
+    $headers = array();
     $all_headers = array(); 
-	$forbidden_headers = array('Host'); // array('Origin', 'Host', 'Referer', 'X-Forwarded-For', 'X-Real-Ip');
+    $forbidden_headers = array('Host'); // array('Origin', 'Host', 'Referer', 'X-Forwarded-For', 'X-Real-Ip');
 
-	// build headers from $_SERVER variants
-	foreach($_SERVER as $key => $value) {
-		if (substr($key, 0, 5) <> 'HTTP_' && $key !== 'CONTENT_TYPE' && $key !== 'CONTENT_LENGTH') {
-			continue;
-		}
-		$all_headers[$key] = $value;
+    // build headers from $_SERVER variants
+    foreach($_SERVER as $key => $value) {
+        if (substr($key, 0, 5) <> 'HTTP_' && $key !== 'CONTENT_TYPE' && $key !== 'CONTENT_LENGTH') {
+            continue;
+        }
+        $all_headers[$key] = $value;
 
-		// skip for raw_header
-		if ($key === 'HTTP_CONTENT_TYPE' || $key === 'HTTP_CONTENT_LENGTH' ||
-			$key === 'HTTP_CONNECTION') {
-			continue;
-		}
+        // skip for raw_header
+        if ($key === 'HTTP_CONTENT_TYPE' || $key === 'HTTP_CONTENT_LENGTH' ||
+            $key === 'HTTP_CONNECTION') {
+            continue;
+        }
 
-		// adjust size
-		if (!empty($append_request_length) && ($key === 'CONTENT_LENGTH')) {
-			$value += $append_request_length;
-		}
+        // adjust size
+        if (!empty($append_request_length) && ($key === 'CONTENT_LENGTH')) {
+            $value += $append_request_length;
+        }
 
-		// php server variants as http-request-header
-		if ($key === 'CONTENT_TYPE' || $key === 'CONTENT_LENGTH') {
-			$key = 'HTTP_'.$key;
-		}
+        // php server variants as http-request-header
+        if ($key === 'CONTENT_TYPE' || $key === 'CONTENT_LENGTH') {
+            $key = 'HTTP_'.$key;
+        }
 
-		$header = str_replace(' ', '-', ucwords(str_replace('_', ' ', strtolower(substr($key, 5)))));
+        $header = str_replace(' ', '-', ucwords(str_replace('_', ' ', strtolower(substr($key, 5)))));
 
-		if (array_search($header, $forbidden_headers) !== false) {
-			continue;
-		}
+        if (array_search($header, $forbidden_headers) !== false) {
+            continue;
+        }
 
-		array_push($headers, $header.': '.$value);
-	}
-	// var_dump($headers);
+        array_push($headers, $header.': '.$value);
+    }
+    // var_dump($headers);
     // var_dump($all_headers);
-	return $headers;
+    return $headers;
 }
 
 function applyResponseHeaders($header_text) {
-	$content_length = 0;
-	foreach (explode("\r\n", $header_text) as $i => $line) {
-		list ($key, $value) = explode(': ', $line);
-		if (empty($value)) {
-			continue;
-		}
+    $content_length = 0;
+    foreach (explode("\r\n", $header_text) as $i => $line) {
+        list ($key, $value) = explode(': ', $line);
+        if (empty($value)) {
+            continue;
+        }
 
-		$ukey = strtoupper($key);
+        $ukey = strtoupper($key);
 
-		// Transfer-Encoding: chunked
-		if (($ukey == 'TRANSFER-ENCODING') &&
-			(stripos($value, 'chunked') !== false))  {
-			continue;
-		}
+        // Transfer-Encoding: chunked
+        if (($ukey == 'TRANSFER-ENCODING') &&
+            (stripos($value, 'chunked') !== false))  {
+            continue;
+        }
 
-   		// Access-Control...
-		// Connection: ...
-		if ((stripos($key, 'ACCESS-CONTROL') !== false) ||
-			($ukey == 'CONNECTION')) {
-			continue;
-		}
+           // Access-Control...
+        // Connection: ...
+        if ((stripos($key, 'ACCESS-CONTROL') !== false) ||
+            ($ukey == 'CONNECTION')) {
+            continue;
+        }
 
-   		// Content-Length: ...
-		if ($ukey == 'CONTENT-LENGTH') {
-			$content_length = $value;
-		}
+           // Content-Length: ...
+        if ($ukey == 'CONTENT-LENGTH') {
+            $content_length = $value;
+        }
 
-		header($line);
-	}
-	return $content_length;
+        header($line);
+    }
+    return $content_length;
 }
 
 error_reporting(E_ALL ^E_WARNING ^E_NOTICE);
@@ -265,7 +265,7 @@ curl_setopt($curl, CURLOPT_VERBOSE, 1);
 // applay/set all options
 $method_name = strtolower($method);
 if (function_exists($method_name)) {
-	call_user_func($method_name, $curl);
+    call_user_func($method_name, $curl);
 }
 
 // adjust headers
@@ -301,7 +301,7 @@ $header = substr($result, 0, $header_size);
 $content_length = applyResponseHeaders($header);
 $body = substr($result, $header_size);
 if (! $content_length) {
-	header('Content-Length: ' . strlen($body));
+    header('Content-Length: ' . strlen($body));
 }
 
 // close backend connection always.

@@ -6,13 +6,12 @@ CLIENT_ID="${2:-c1285a991ba7db5c395a}"
 if [[ -z "$1" ]]; then
 	echo 'Usage: bash try.sh <Gateway>'
 	exit
-else
-	echo "Try gateway: $1"
 fi
 
 PROTOCOL=$(echo "$1" | grep -Eoe '^https?://')
-PROTOCOL=${PROTOCOL:-http://}
+PROTOCOL=${PROTOCOL:-https://}
 DOMAIN=$(echo "$1" | sed -E 's/^https*:\/\/|\/$//g')
+echo "Try gateway: $DOMAIN with ${PROTOCOL%://}"
 
 echo '-> Get code, open browser and pick the code from redirected url'
 open "https://github.com/login/oauth/authorize?scope=public_repo&client_id=$CLIENT_ID"
